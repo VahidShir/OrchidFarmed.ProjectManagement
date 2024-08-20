@@ -1,20 +1,33 @@
 
+using Microsoft.EntityFrameworkCore;
+
+using OrchidFarmed.ProjectManagement.Infrastructure.Persistence;
+
 namespace OrchidFarmed.ProjectManagement.WebApi;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        var configuration = builder.Configuration;
+        var services = builder.Services;
+
         // Add services to the container.
 
-        builder.Services.AddControllers();
+        services.AddDbContext<AppDbContext>(options =>
+                                    options.UseSqlServer(configuration.GetConnectionString("Default")));
+
+        services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
 
         var app = builder.Build();
+
+        //automatic db migrations by running the app
+        await MigrateDatabase(app.Services);
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
@@ -31,5 +44,14 @@ public class Program
         app.MapControllers();
 
         app.Run();
+    }
+
+    private static async Task MigrateDatabase(IServiceProvider service)
+    {
+        using (var serviceScope = service.CreateScope())
+        {
+            var dbContext = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
+            await dbContext.Database.MigrateAsync();
+        }
     }
 }

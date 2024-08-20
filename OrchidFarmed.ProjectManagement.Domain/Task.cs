@@ -5,12 +5,13 @@ using TaskStatus = OrchidFarmed.ProjectManagement.Domain.Shared.TaskStatus;
 
 namespace OrchidFarmed.ProjectManagement.Domain;
 
-internal class Task
+public class Task
 {
     //business rule
     private TimeSpan _minimumDueDateSpan = TimeSpan.FromMinutes(15);
 
     public Guid Id { get; private set; }
+    public Guid ProjectId { get; private set; }
     public string Name { get; private set; }
     public string Description { get; private set; }
     public DateTime? DueDate { get; private set; }

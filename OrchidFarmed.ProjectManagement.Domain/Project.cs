@@ -3,7 +3,7 @@ using OrchidFarmed.ProjectManagement.Domain.Shared.Extensions;
 
 namespace OrchidFarmed.ProjectManagement.Domain;
 
-internal class Project
+public class Project
 {
     public Guid Id { get; private set; }
     public string Name { get; private set; }

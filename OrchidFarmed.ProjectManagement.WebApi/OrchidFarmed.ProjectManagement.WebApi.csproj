@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OrchidFarmed.ProjectManagement.Application.Contracts\OrchidFarmed.ProjectManagement.Application.Contracts.csproj" />
+    <ProjectReference Include="..\OrchidFarmed.ProjectManagement.Infrastructure\OrchidFarmed.ProjectManagement.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
