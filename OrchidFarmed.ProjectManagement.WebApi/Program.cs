@@ -1,7 +1,9 @@
 
 using Microsoft.EntityFrameworkCore;
 
+using OrchidFarmed.ProjectManagement.Domain.Repositories;
 using OrchidFarmed.ProjectManagement.Infrastructure.Persistence;
+using OrchidFarmed.ProjectManagement.Infrastructure.Persistence.Repositories;
 
 namespace OrchidFarmed.ProjectManagement.WebApi;
 
@@ -18,6 +20,8 @@ public class Program
 
         services.AddDbContext<AppDbContext>(options =>
                                     options.UseSqlServer(configuration.GetConnectionString("Default")));
+
+        services.AddScoped<IProjectRepository, ProjectRepository>();
 
         services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
