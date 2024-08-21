@@ -1,4 +1,6 @@
 
+using Asp.Versioning;
+
 using Microsoft.EntityFrameworkCore;
 
 using OrchidFarmed.ProjectManagement.Domain.Repositories;
@@ -22,6 +24,8 @@ public class Program
                                     options.UseSqlServer(configuration.GetConnectionString("Default")));
 
         services.AddScoped<IProjectRepository, ProjectRepository>();
+
+        ConfigApiVersioning(services);
 
         services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -57,5 +61,22 @@ public class Program
             var dbContext = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
             await dbContext.Database.MigrateAsync();
         }
+    }
+
+    private static void ConfigApiVersioning(IServiceCollection services)
+    {
+        services.AddApiVersioning(options =>
+            {
+                options.DefaultApiVersion = new ApiVersion(1);
+                options.ReportApiVersions = true;
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.ApiVersionReader = ApiVersionReader.Combine(new UrlSegmentApiVersionReader());
+            })
+            .AddMvc() // This is needed for controllers
+            .AddApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'V";
+                options.SubstituteApiVersionInUrl = true;
+            });
     }
 }
