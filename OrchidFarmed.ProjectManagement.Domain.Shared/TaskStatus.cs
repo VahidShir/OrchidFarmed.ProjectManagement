@@ -3,6 +3,6 @@
 public enum TaskStatus
 {
     ToDo = 0,
-    InProgress = 0,
-    Done = 0
+    InProgress = 1,
+    Done = 2
 }

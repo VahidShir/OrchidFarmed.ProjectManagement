@@ -30,7 +30,11 @@ public class Program
         services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        services.AddSwaggerGen(options =>
+        {
+            // see https://github.com/domaindrivendev/Swashbuckle.AspNetCore/issues/1607
+            options.CustomSchemaIds(type => type.ToString());
+        });
 
         var app = builder.Build();
 

@@ -29,13 +29,13 @@ public class ProjectController : ControllerBase
     }
 
     [HttpGet("{projectId}/tasks/{taskId}")]
-    public async Task<ActionResult<ProjectDto>> GetTask(Guid taskId)
+    public async Task<ActionResult<ProjectDto>> GetTask(Guid projectId, Guid taskId)
     {
         return Ok();
     }
 
     [HttpGet("{projectId}/tasks/")]
-    public async Task<ActionResult<ProjectDto>> GetAllTasks()
+    public async Task<ActionResult<ProjectDto>> GetTasks(Guid projectId)
     {
         return Ok();
     }
