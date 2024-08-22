@@ -3,6 +3,7 @@ using Asp.Versioning;
 
 using Microsoft.EntityFrameworkCore;
 
+using OrchidFarmed.ProjectManagement.Application.Commands;
 using OrchidFarmed.ProjectManagement.Domain.Repositories;
 using OrchidFarmed.ProjectManagement.Infrastructure.Persistence;
 using OrchidFarmed.ProjectManagement.Infrastructure.Persistence.Repositories;
@@ -35,6 +36,8 @@ public class Program
             // see https://github.com/domaindrivendev/Swashbuckle.AspNetCore/issues/1607
             options.CustomSchemaIds(type => type.ToString());
         });
+
+        services.AddMediatR(cf => cf.RegisterServicesFromAssembly(typeof(CreateProjectCommand).Assembly));
 
         var app = builder.Build();
 

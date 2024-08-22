@@ -9,11 +9,13 @@
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
+    <PackageReference Include="MediatR" Version="12.4.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\OrchidFarmed.ProjectManagement.Application.Contracts\OrchidFarmed.ProjectManagement.Application.Contracts.csproj" />
+    <ProjectReference Include="..\OrchidFarmed.ProjectManagement.Application\OrchidFarmed.ProjectManagement.Application.csproj" />
     <ProjectReference Include="..\OrchidFarmed.ProjectManagement.Infrastructure\OrchidFarmed.ProjectManagement.Infrastructure.csproj" />
   </ItemGroup>
 

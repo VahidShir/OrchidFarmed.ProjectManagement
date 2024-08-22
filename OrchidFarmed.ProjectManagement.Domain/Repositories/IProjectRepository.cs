@@ -11,7 +11,9 @@ public interface IProjectRepository
     System.Threading.Tasks.Task<Project> GetAsync(Guid projectId);
     System.Threading.Tasks.Task<Project> GetAsync(Expression<Func<Project, bool>> predicate);
     System.Threading.Tasks.Task<IEnumerable<Project>> GetListAsync(Expression<Func<Project, bool>> predicate);
+    System.Threading.Tasks.Task<IEnumerable<Project>> GetAllAsync();
     System.Threading.Tasks.Task<Project> UpdateAsync(Project project);
     System.Threading.Tasks.Task<bool> ExistsAsync(Expression<Func<Project, bool>> predicate);
-    System.Threading.Tasks.Task SaveChangesAsync(Project project);
+    System.Threading.Tasks.Task<Task> GetTaskAsync(Guid taskId);
+    System.Threading.Tasks.Task SaveChangesAsync();
 }

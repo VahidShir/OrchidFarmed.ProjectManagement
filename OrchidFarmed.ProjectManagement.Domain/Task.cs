@@ -21,9 +21,11 @@ public class Task
 
     private Task() { }
 
-    public Task(Guid id, string name, string description, DateTime dueDate)
+    public Task(Guid projectId, Guid id, string name, string description, DateTime dueDate)
     {
         Validate(id, name, description, dueDate);
+
+        ProjectId = projectId;
         Id = id;
         Name = name;
         Description = description;
@@ -46,6 +48,11 @@ public class Task
         Status = TaskStatus.ToDo;
     }
 
+    public void UpdateStatus(TaskStatus newStatus)
+    {
+        Status = newStatus;
+    }
+
     private void Validate(Guid id, string name, string description, DateTime dueDate)
     {
         if (id == Guid.Empty)
@@ -55,7 +62,7 @@ public class Task
             throw new BusinessException($"The parameter {nameof(name)} cannot be empty or null");
 
         if (description.IsNullOrEmptyWhiteSpace())
-            throw new ArgumentException($"The parameter {nameof(description)} cannot be empty or null");
+            throw new BusinessException($"The parameter {nameof(description)} cannot be empty or null");
 
         if (dueDate < DateTime.UtcNow.Add(_minimumDueDateSpan))
             throw new BusinessException("The task due date must be at least 15 minutes later.");

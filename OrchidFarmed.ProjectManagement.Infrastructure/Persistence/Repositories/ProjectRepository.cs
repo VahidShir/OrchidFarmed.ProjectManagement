@@ -63,8 +63,18 @@ public class ProjectRepository : IProjectRepository
         return result?.Entity;
     }
 
-    public async System.Threading.Tasks.Task SaveChangesAsync(Project project)
+    public async System.Threading.Tasks.Task SaveChangesAsync()
     {
         await _dbContext.SaveChangesAsync();
+    }
+
+    public async System.Threading.Tasks.Task<IEnumerable<Project>> GetAllAsync()
+    {
+        return await _dbContext.Projects.ToListAsync();
+    }
+
+    public async System.Threading.Tasks.Task<Domain.Task> GetTaskAsync(Guid taskId)
+    {
+        return await _dbContext.Tasks.FindAsync(taskId);
     }
 }

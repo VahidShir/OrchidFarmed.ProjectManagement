@@ -32,7 +32,7 @@ public class Project
     {
         ThrowIfTaskIsDuplicate(id);
 
-        var newTask = new Task(id, name, description, dueDate);
+        var newTask = new Task(this.Id, id, name, description, dueDate);
 
         _tasks.Add(newTask);
     }
@@ -42,6 +42,16 @@ public class Project
         ThrowIfTaskIsDuplicate(task.Id);
 
         _tasks.Add(task);
+    }
+
+    public void DeleteTask(Guid taskId)
+    {
+        var task = _tasks.SingleOrDefault(t => t.Id == taskId);
+
+        if (task == null)
+            throw new TaskNotFoundException();
+
+        _tasks.Remove(task);
     }
 
     private void ThrowIfTaskIsDuplicate(Guid id)
@@ -60,6 +70,6 @@ public class Project
             throw new BusinessException($"The parameter {nameof(name)} cannot be empty or null");
 
         if (description.IsNullOrEmptyWhiteSpace())
-            throw new ArgumentException($"The parameter {nameof(description)} cannot be empty or null");
+            throw new BusinessException($"The parameter {nameof(description)} cannot be empty or null");
     }
 }

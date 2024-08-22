@@ -13,6 +13,8 @@ internal class ProjectEntityTypeConfiguration : IEntityTypeConfiguration<Project
             .ToTable("Projects")
             .HasKey(x => x.Id);
 
+        modelBuilder.Property(x => x.Id).ValueGeneratedNever();
+
         modelBuilder
             .Property(x => x.Name)
             .IsRequired()
@@ -33,5 +35,7 @@ internal class ProjectEntityTypeConfiguration : IEntityTypeConfiguration<Project
             .Metadata
             .FindNavigation("Tasks")
             .SetPropertyAccessMode(PropertyAccessMode.Field);
+
+        modelBuilder.Navigation(x => x.Tasks).AutoInclude();
     }
 }
