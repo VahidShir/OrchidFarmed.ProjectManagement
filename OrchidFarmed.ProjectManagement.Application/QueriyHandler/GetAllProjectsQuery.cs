@@ -1,15 +1,11 @@
 ﻿using MediatR;
 
 using OrchidFarmed.ProjectManagement.Application.Contracts;
+using OrchidFarmed.ProjectManagement.Application.Contracts.Queries;
 using OrchidFarmed.ProjectManagement.Domain;
 using OrchidFarmed.ProjectManagement.Domain.Repositories;
 
 namespace OrchidFarmed.ProjectManagement.Application.Queries;
-
-public record GetAllProjectsQuery : IRequest<IEnumerable<ProjectDto>>
-{
-
-}
 
 public class GetAllProjectsQueryHandler : IRequestHandler<GetAllProjectsQuery, IEnumerable<ProjectDto>>
 {

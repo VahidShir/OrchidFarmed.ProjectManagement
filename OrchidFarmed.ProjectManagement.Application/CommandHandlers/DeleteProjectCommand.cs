@@ -1,18 +1,9 @@
 ﻿using MediatR;
 
+using OrchidFarmed.ProjectManagement.Application.Contracts.Commands;
 using OrchidFarmed.ProjectManagement.Domain.Repositories;
 
 namespace OrchidFarmed.ProjectManagement.Application.Commands;
-
-public record DeleteProjectCommand : IRequest
-{
-    public Guid ProjectId { get; set; }
-
-    public DeleteProjectCommand(Guid projectId)
-    {
-        ProjectId = projectId;
-    }
-}
 
 public class DeleteProjectCommandHandler : IRequestHandler<DeleteProjectCommand>
 {

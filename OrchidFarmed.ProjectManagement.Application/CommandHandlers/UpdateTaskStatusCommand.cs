@@ -1,27 +1,11 @@
 ﻿using MediatR;
 
 using OrchidFarmed.ProjectManagement.Application.Contracts;
+using OrchidFarmed.ProjectManagement.Application.Contracts.Commands;
 using OrchidFarmed.ProjectManagement.Domain.Repositories;
-using OrchidFarmed.ProjectManagement.Domain.Shared;
 using OrchidFarmed.ProjectManagement.Domain.Shared.Exceptions;
 
-using TaskStatus = OrchidFarmed.ProjectManagement.Domain.Shared.TaskStatus;
-
 namespace OrchidFarmed.ProjectManagement.Application.Commands;
-
-public record UpdateTaskStatusCommand : IRequest<TaskDto>
-{
-    public Guid ProjectId { get; set; }
-    public Guid TaskId { get; set; }
-    public TaskStatus Status { get; set; }
-
-    public UpdateTaskStatusCommand(Guid projectId, Guid taskId, TaskStatus status)
-    {
-        ProjectId = projectId;
-        TaskId = taskId;
-        Status = status;
-    }
-}
 
 public class UpdateTaskStatusCommandHandler : IRequestHandler<UpdateTaskStatusCommand, TaskDto>
 {

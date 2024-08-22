@@ -1,19 +1,10 @@
 ﻿using MediatR;
 
 using OrchidFarmed.ProjectManagement.Application.Contracts;
+using OrchidFarmed.ProjectManagement.Application.Contracts.Queries;
 using OrchidFarmed.ProjectManagement.Domain.Repositories;
 
 namespace OrchidFarmed.ProjectManagement.Application.Queries;
-
-public record GetProjectQuery : IRequest<ProjectDto>
-{
-    public Guid ProjectId { get; set; }
-
-    public GetProjectQuery(Guid projectId)
-    {
-        ProjectId = projectId;
-    }
-}
 
 public class GetProjectQueryHandler : IRequestHandler<GetProjectQuery, ProjectDto>
 {

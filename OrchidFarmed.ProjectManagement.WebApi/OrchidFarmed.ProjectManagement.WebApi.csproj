@@ -15,8 +15,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OrchidFarmed.ProjectManagement.Application.Contracts\OrchidFarmed.ProjectManagement.Application.Contracts.csproj" />
-    <ProjectReference Include="..\OrchidFarmed.ProjectManagement.Application\OrchidFarmed.ProjectManagement.Application.csproj" />
     <ProjectReference Include="..\OrchidFarmed.ProjectManagement.Infrastructure\OrchidFarmed.ProjectManagement.Infrastructure.csproj" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy &quot;$(SolutionDir)OrchidFarmed.ProjectManagement.Application\bin\$(Configuration)\net8.0\OrchidFarmed.ProjectManagement.Application.dll&quot; &quot;$(TargetDir)&quot;" />
+  </Target>
 
 </Project>

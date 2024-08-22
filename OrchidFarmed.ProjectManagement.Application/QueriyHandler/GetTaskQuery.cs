@@ -1,22 +1,11 @@
 ﻿using MediatR;
 
 using OrchidFarmed.ProjectManagement.Application.Contracts;
+using OrchidFarmed.ProjectManagement.Application.Contracts.Queries;
 using OrchidFarmed.ProjectManagement.Domain.Repositories;
 using OrchidFarmed.ProjectManagement.Domain.Shared.Exceptions;
 
 namespace OrchidFarmed.ProjectManagement.Application.Queries;
-
-public record GetTaskQuery : IRequest<TaskDto>
-{
-    public Guid ProjectId { get; set; }
-    public Guid TaskId { get; set; }
-
-    public GetTaskQuery(Guid projectId, Guid taskId)
-    {
-        ProjectId = projectId;
-        TaskId = taskId;
-    }
-}
 
 public class GetTaskQueryHandler : IRequestHandler<GetTaskQuery, TaskDto>
 {

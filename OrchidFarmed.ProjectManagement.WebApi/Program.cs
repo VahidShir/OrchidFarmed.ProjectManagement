@@ -3,10 +3,12 @@ using Asp.Versioning;
 
 using Microsoft.EntityFrameworkCore;
 
-using OrchidFarmed.ProjectManagement.Application.Commands;
+using OrchidFarmed.ProjectManagement.Application.Contracts.Commands;
 using OrchidFarmed.ProjectManagement.Domain.Repositories;
 using OrchidFarmed.ProjectManagement.Infrastructure.Persistence;
 using OrchidFarmed.ProjectManagement.Infrastructure.Persistence.Repositories;
+
+using System.Reflection;
 
 namespace OrchidFarmed.ProjectManagement.WebApi;
 
@@ -37,7 +39,7 @@ public class Program
             options.CustomSchemaIds(type => type.ToString());
         });
 
-        services.AddMediatR(cf => cf.RegisterServicesFromAssembly(typeof(CreateProjectCommand).Assembly));
+        ConfigMediatR(services);
 
         var app = builder.Build();
 
@@ -59,6 +61,15 @@ public class Program
         app.MapControllers();
 
         app.Run();
+    }
+
+    private static void ConfigMediatR(IServiceCollection services)
+    {
+        var applicationProjectAssemblyPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "OrchidFarmed.ProjectManagement.Application.dll");
+        var applicationProjectAssembly = Assembly.LoadFile(applicationProjectAssemblyPath);
+
+        services.AddMediatR(cf => cf.RegisterServicesFromAssemblies(typeof(CreateProjectCommand).Assembly
+            , applicationProjectAssembly));
     }
 
     private static async Task MigrateDatabase(IServiceProvider service)

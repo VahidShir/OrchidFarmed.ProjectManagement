@@ -1,21 +1,10 @@
 ﻿using MediatR;
 
+using OrchidFarmed.ProjectManagement.Application.Contracts.Commands;
 using OrchidFarmed.ProjectManagement.Domain.Repositories;
 using OrchidFarmed.ProjectManagement.Domain.Shared.Exceptions;
 
 namespace OrchidFarmed.ProjectManagement.Application.Commands;
-
-public record DeleteTaskCommand : IRequest
-{
-    public Guid ProjectId { get; set; }
-    public Guid TaskId { get; set; }
-
-    public DeleteTaskCommand(Guid projectId, Guid taskId)
-    {
-        ProjectId = projectId;
-        TaskId = taskId;
-    }
-}
 
 public class DeleteTaskCommandHandler : IRequestHandler<DeleteTaskCommand>
 {

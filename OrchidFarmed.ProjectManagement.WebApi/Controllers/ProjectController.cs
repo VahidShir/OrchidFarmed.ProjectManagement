@@ -4,9 +4,9 @@ using MediatR;
 
 using Microsoft.AspNetCore.Mvc;
 
-using OrchidFarmed.ProjectManagement.Application.Commands;
 using OrchidFarmed.ProjectManagement.Application.Contracts;
-using OrchidFarmed.ProjectManagement.Application.Queries;
+using OrchidFarmed.ProjectManagement.Application.Contracts.Commands;
+using OrchidFarmed.ProjectManagement.Application.Contracts.Queries;
 using OrchidFarmed.ProjectManagement.Domain.Shared.Exceptions;
 
 using System.Net;

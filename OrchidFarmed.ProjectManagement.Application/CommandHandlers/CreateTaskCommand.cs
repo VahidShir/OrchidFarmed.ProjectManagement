@@ -1,26 +1,11 @@
 ﻿using MediatR;
 
 using OrchidFarmed.ProjectManagement.Application.Contracts;
+using OrchidFarmed.ProjectManagement.Application.Contracts.Commands;
 using OrchidFarmed.ProjectManagement.Domain.Repositories;
 using OrchidFarmed.ProjectManagement.Domain.Shared.Exceptions;
 
 namespace OrchidFarmed.ProjectManagement.Application.Commands;
-
-public record CreateTaskCommand : IRequest<TaskDto>
-{
-    public Guid ProjectId { get; set; }
-    public string Name { get; set; }
-    public string Description { get; set; }
-    public DateTime DueDate { get; set; }
-
-    public CreateTaskCommand(Guid projectId, string name, string description, DateTime dueTime)
-    {
-        ProjectId = projectId;
-        Name = name;
-        Description = description;
-        DueDate = dueTime;
-    }
-}
 
 public class CreateTaskCommandHandler : IRequestHandler<CreateTaskCommand, TaskDto>
 {

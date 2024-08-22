@@ -1,22 +1,12 @@
 ﻿using MediatR;
 
 using OrchidFarmed.ProjectManagement.Application.Contracts;
+using OrchidFarmed.ProjectManagement.Application.Contracts.Commands;
 using OrchidFarmed.ProjectManagement.Domain;
 using OrchidFarmed.ProjectManagement.Domain.Repositories;
 
 namespace OrchidFarmed.ProjectManagement.Application.Commands;
 
-public record CreateProjectCommand : IRequest<ProjectDto>
-{
-    public string Name { get; set; }
-    public string Description { get; set; }
-
-    public CreateProjectCommand(string name, string description)
-    {
-        Name = name;
-        Description = description;
-    }
-}
 
 public class CreateProjectCommandHandler : IRequestHandler<CreateProjectCommand, ProjectDto>
 {

@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MediatR" Version="12.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\OrchidFarmed.ProjectManagement.Domain.Shared\OrchidFarmed.ProjectManagement.Domain.Shared.csproj" />
   </ItemGroup>
 
