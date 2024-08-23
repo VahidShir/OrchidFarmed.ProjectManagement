@@ -1,0 +1,28 @@
+version: '3.4'
+networks:
+    projectManagementNetwork:
+ 
+services:
+    SqlServerDb:
+        container_name: SqlServerContainer
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        ports:
+            - 8002:1433
+        volumes:
+            - ./docker_volumes/data:/var/opt/mssql/data
+            - ./docker_volumes/log:/var/opt/mssql/log
+            - ./docker_volumes/secrets:/var/opt/mssql/secrets
+        environment:
+            - ACCEPT_EULA=Y
+            # db password should not be kept in a safe place in production env
+            - MSSQL_SA_PASSWORD=1qaz!QAZ
+    projectmanagement.api:
+        container_name: WebApiContainer
+        image: ${DOCKER_REGISTRY-}projectmanagementwebapi
+        ports:
+            - 8080:8080
+        build:
+          context: .
+          dockerfile: OrchidFarmed.ProjectManagement.WebApi/Dockerfile
+        depends_on:
+            - SqlServerDb
