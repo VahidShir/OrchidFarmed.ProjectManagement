@@ -3,14 +3,19 @@ using Asp.Versioning;
 
 using FluentValidation;
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 using OrchidFarmed.ProjectManagement.Application.Contracts.Commands;
+using OrchidFarmed.ProjectManagement.Application.Contracts.Settings;
 using OrchidFarmed.ProjectManagement.Domain.Repositories;
 using OrchidFarmed.ProjectManagement.Infrastructure.Persistence;
 using OrchidFarmed.ProjectManagement.Infrastructure.Persistence.Repositories;
 
 using System.Reflection;
+using System.Text;
 
 namespace OrchidFarmed.ProjectManagement.WebApi;
 
@@ -25,8 +30,16 @@ public class Program
 
         // Add services to the container.
 
+        services.Configure<IdentitySettings>(configuration.GetSection("IdentitySettings"));
+
         services.AddDbContext<AppDbContext>(options =>
                                     options.UseSqlServer(configuration.GetConnectionString("Default")));
+
+        services.AddIdentity<IdentityUser, IdentityRole>()
+            .AddDefaultTokenProviders()
+            .AddEntityFrameworkStores<AppDbContext>();
+
+        ConfigAuthentication(configuration, services);
 
         services.AddScoped<IProjectRepository, ProjectRepository>();
 
@@ -59,11 +72,39 @@ public class Program
 
         app.UseHttpsRedirection();
 
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapControllers();
 
         app.Run();
+    }
+
+    private static void ConfigAuthentication(ConfigurationManager configuration, IServiceCollection services)
+    {
+        var apiSettings = configuration.GetSection("IdentitySettings").Get<IdentitySettings>();
+        var key = Encoding.UTF8.GetBytes(apiSettings.SecretKey);
+
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(x =>
+        {
+            x.RequireHttpsMetadata = false;
+            x.SaveToken = true;
+            x.TokenValidationParameters = new()
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateAudience = true,
+                ValidateIssuer = true,
+                ValidAudience = apiSettings.ValidAudience,
+                ValidIssuer = apiSettings.ValidIssuer
+            };
+        });
     }
 
     private static void ConfigMediatR(IServiceCollection services)

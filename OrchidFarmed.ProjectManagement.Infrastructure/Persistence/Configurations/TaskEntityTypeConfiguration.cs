@@ -13,6 +13,10 @@ internal class TaskEntityTypeConfiguration : IEntityTypeConfiguration<Task>
             .ToTable("Tasks")
             .HasKey(x => x.Id);
 
+        modelBuilder
+            .Property(x => x.UserId)
+            .IsRequired();
+
         modelBuilder.Property(x => x.Id).ValueGeneratedNever();
 
         modelBuilder

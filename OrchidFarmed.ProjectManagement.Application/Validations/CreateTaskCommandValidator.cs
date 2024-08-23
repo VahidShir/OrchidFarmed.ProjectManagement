@@ -22,5 +22,8 @@ public class CreateTaskCommandValidator : AbstractValidator<CreateTaskCommand>
         RuleFor(x => x.DueDate)
             .NotNull().WithMessage("The parameter DueDate must be NOT null or empty.")
             .Must(x => x >= DateTime.UtcNow.Add(TimeSpan.FromMinutes(15))).WithMessage("The parameter task DueDate must be at least 15 minutes later.");
+
+        RuleFor(x => x.UserId)
+            .Must(x => x.ToString().ToLower() != Guid.Empty.ToString()).WithMessage("The parameter UserId must NOT be null or empty or default.");
     }
 }

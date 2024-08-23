@@ -13,6 +13,10 @@ internal class ProjectEntityTypeConfiguration : IEntityTypeConfiguration<Project
             .ToTable("Projects")
             .HasKey(x => x.Id);
 
+        modelBuilder
+            .Property(x => x.UserId)
+            .IsRequired();
+
         modelBuilder.Property(x => x.Id).ValueGeneratedNever();
 
         modelBuilder

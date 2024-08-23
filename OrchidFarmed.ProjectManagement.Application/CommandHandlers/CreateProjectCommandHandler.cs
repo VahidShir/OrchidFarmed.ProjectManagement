@@ -25,7 +25,7 @@ public class CreateProjectCommandHandler : IRequestHandler<CreateProjectCommand,
     {
         _validator.ValidateAndThrow(request);
 
-        var project = new Project(Guid.NewGuid(), request.Name, request.Description);
+        var project = new Project(id: Guid.NewGuid(), userId:request.UserId, request.Name, request.Description);
 
         await _projectRepository.AddAsync(project);
 
@@ -33,6 +33,7 @@ public class CreateProjectCommandHandler : IRequestHandler<CreateProjectCommand,
 
         return new ProjectDto
         {
+            UserId = request.UserId,
             Id = project.Id,
             Name = request.Name,
             Description = request.Description

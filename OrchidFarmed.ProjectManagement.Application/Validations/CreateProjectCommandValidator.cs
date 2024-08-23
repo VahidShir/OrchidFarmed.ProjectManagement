@@ -15,5 +15,8 @@ public class CreateProjectCommandValidator : AbstractValidator<CreateProjectComm
         RuleFor(x => x.Description)
             .NotEmpty().WithMessage("The parameter Description must be NOT null or empty.")
             .MaximumLength(200).WithMessage($"The length of the parameter Description must be maximum 500.");
+
+        RuleFor(x => x.UserId)
+            .Must(x => x.ToString().ToLower() != Guid.Empty.ToString()).WithMessage("The parameter UserId must NOT be null or empty or default.");
     }
 }

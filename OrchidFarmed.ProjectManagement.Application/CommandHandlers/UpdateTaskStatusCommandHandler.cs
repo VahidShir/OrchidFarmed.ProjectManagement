@@ -29,6 +29,9 @@ public class UpdateTaskStatusCommandHandler : IRequestHandler<UpdateTaskStatusCo
         if (project == null)
             throw new ProjectNotFoundException();
 
+        if (project.UserId != request.UserId)
+            throw new ForbiddenOperationException();
+
         var task = project.Tasks.SingleOrDefault(t => t.Id == request.TaskId);
 
         if (task == null)
@@ -42,6 +45,7 @@ public class UpdateTaskStatusCommandHandler : IRequestHandler<UpdateTaskStatusCo
 
         return new TaskDto
         {
+            UserId = request.UserId,
             ProjectId = task.ProjectId,
             Id = task.Id,
             Name = task.Name,

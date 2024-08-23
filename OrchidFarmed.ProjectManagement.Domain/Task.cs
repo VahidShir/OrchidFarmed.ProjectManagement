@@ -13,6 +13,7 @@ public class Task
     private TimeSpan _minimumDueDateSpan = TimeSpan.FromMinutes(15);
 
     public Guid Id { get; private set; }
+    public Guid UserId { get; private set; }
     public Guid ProjectId { get; private set; }
     public string Name { get; private set; }
     public string Description { get; private set; }
@@ -21,12 +22,13 @@ public class Task
 
     private Task() { }
 
-    public Task(Guid projectId, Guid id, string name, string description, DateTime dueDate)
+    public Task(Guid userId, Guid projectId, Guid id, string name, string description, DateTime dueDate)
     {
-        Validate(id, name, description, dueDate);
+        Validate(userId, projectId, id, name, description, dueDate);
 
         ProjectId = projectId;
         Id = id;
+        UserId = userId;
         Name = name;
         Description = description;
         DueDate = dueDate;
@@ -53,10 +55,16 @@ public class Task
         Status = newStatus;
     }
 
-    private void Validate(Guid id, string name, string description, DateTime dueDate)
+    private void Validate(Guid userId, Guid projectId, Guid id, string name, string description, DateTime dueDate)
     {
         if (id == Guid.Empty)
             throw new BusinessException("id cannot be empty or default");
+
+        if (projectId == Guid.Empty)
+            throw new BusinessException("projectId cannot be empty or default");
+
+        if (userId == Guid.Empty)
+            throw new BusinessException("userId cannot be empty or default");
 
         if (name.IsNullOrEmptyWhiteSpace())
             throw new BusinessException($"The parameter {nameof(name)} cannot be empty or null");

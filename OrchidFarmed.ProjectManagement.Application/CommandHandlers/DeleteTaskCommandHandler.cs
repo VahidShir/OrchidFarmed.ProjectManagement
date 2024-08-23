@@ -28,7 +28,15 @@ public class DeleteTaskCommandHandler : IRequestHandler<DeleteTaskCommand>
         if (project == null)
             throw new ProjectNotFoundException();
 
-        project.DeleteTask(request.TaskId);        
+        if (project.UserId != request.UserId)
+            throw new ForbiddenOperationException();
+
+        var task = project.Tasks.SingleOrDefault(t => t.Id == request.TaskId);
+
+        if (task == null)
+            throw new TaskNotFoundException();
+
+        project.DeleteTask(request.TaskId);
 
         await _projectRepository.UpdateAsync(project);
 

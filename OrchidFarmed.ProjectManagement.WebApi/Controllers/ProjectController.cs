@@ -4,23 +4,28 @@ using FluentValidation;
 
 using MediatR;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using OrchidFarmed.ProjectManagement.Application.Contracts;
 using OrchidFarmed.ProjectManagement.Application.Contracts.Commands;
 using OrchidFarmed.ProjectManagement.Application.Contracts.Queries;
 using OrchidFarmed.ProjectManagement.Domain.Shared.Exceptions;
+using OrchidFarmed.ProjectManagement.Domain.Shared.Extensions;
 
 using System.Net;
+using System.Security.Claims;
 
 namespace OrchidFarmed.ProjectManagement.WebApi.Controllers;
 
+[Authorize]
 [ApiVersion(1)]
 [ApiController]
 [Route("api/v{v:apiVersion}/[controller]")]
 public class ProjectController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private Guid _userId => GetUserId();
 
     public ProjectController(IMediator mediator)
     {
@@ -30,7 +35,7 @@ public class ProjectController : ControllerBase
     [HttpGet("{projectId}")]
     public async Task<ActionResult<ProjectDto>> GetProject(Guid projectId)
     {
-        var query = new GetProjectQuery(projectId);
+        var query = new GetProjectQuery(_userId, projectId);
 
         try
         {
@@ -40,6 +45,10 @@ public class ProjectController : ControllerBase
                 return NotFound();
 
             return Ok(project);
+        }
+        catch (ForbiddenOperationException ex)
+        {
+            return StatusCode((int)HttpStatusCode.Forbidden, ex.Message);
         }
         catch (BusinessException ex)
         {
@@ -54,7 +63,7 @@ public class ProjectController : ControllerBase
     [HttpGet()]
     public async Task<ActionResult<IList<ProjectDto>>> GetAllProjects()
     {
-        var query = new GetAllProjectsQuery();
+        var query = new GetAllProjectsQuery(_userId);
 
         try
         {
@@ -75,7 +84,7 @@ public class ProjectController : ControllerBase
     [HttpGet("{projectId}/tasks/{taskId}")]
     public async Task<ActionResult<TaskDto>> GetTask(Guid projectId, Guid taskId)
     {
-        var query = new GetTaskQuery(projectId, taskId);
+        var query = new GetTaskQuery(_userId, projectId, taskId);
 
         try
         {
@@ -85,6 +94,10 @@ public class ProjectController : ControllerBase
                 return NotFound();
 
             return Ok(task);
+        }
+        catch (ForbiddenOperationException ex)
+        {
+            return StatusCode((int)HttpStatusCode.Forbidden, ex.Message);
         }
         catch (BusinessException ex)
         {
@@ -99,7 +112,7 @@ public class ProjectController : ControllerBase
     [HttpGet("{projectId}/tasks/")]
     public async Task<ActionResult<IEnumerable<TaskDto>>> GetTasks(Guid projectId)
     {
-        var query = new GetProjectQuery(projectId);
+        var query = new GetProjectQuery(_userId, projectId);
 
         try
         {
@@ -109,6 +122,10 @@ public class ProjectController : ControllerBase
                 return NotFound();
 
             return Ok(project.Tasks);
+        }
+        catch (ForbiddenOperationException ex)
+        {
+            return StatusCode((int)HttpStatusCode.Forbidden, ex.Message);
         }
         catch (BusinessException ex)
         {
@@ -126,7 +143,7 @@ public class ProjectController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var command = new CreateProjectCommand(request.Name, request.Description);
+        var command = new CreateProjectCommand(_userId, request.Name, request.Description);
 
         try
         {
@@ -134,7 +151,7 @@ public class ProjectController : ControllerBase
 
             return CreatedAtAction(actionName: nameof(GetProject), routeValues: new { projectId = project.Id }, project);
         }
-        catch (Exception ex) when(ex is BusinessException || ex is ValidationException)
+        catch (Exception ex) when (ex is BusinessException || ex is ValidationException)
         {
             return BadRequest(ex.Message);
         }
@@ -147,7 +164,7 @@ public class ProjectController : ControllerBase
     [HttpDelete("{projectId}")]
     public async Task<ActionResult> DeleteProject(Guid projectId)
     {
-        var command = new DeleteProjectCommand(projectId);
+        var command = new DeleteProjectCommand(_userId, projectId);
 
         try
         {
@@ -159,7 +176,11 @@ public class ProjectController : ControllerBase
         {
             return NotFound();
         }
-        catch (Exception ex) when(ex is BusinessException || ex is ValidationException)
+        catch (ForbiddenOperationException ex)
+        {
+            return StatusCode((int)HttpStatusCode.Forbidden, ex.Message);
+        }
+        catch (Exception ex) when (ex is BusinessException || ex is ValidationException)
         {
             return BadRequest(ex.Message);
         }
@@ -172,7 +193,7 @@ public class ProjectController : ControllerBase
     [HttpDelete("{projectId}/tasks/{taskId}")]
     public async Task<ActionResult> DeleteTask(Guid projectId, Guid taskId)
     {
-        var command = new DeleteTaskCommand(projectId, taskId);
+        var command = new DeleteTaskCommand(_userId, projectId, taskId);
 
         try
         {
@@ -188,7 +209,11 @@ public class ProjectController : ControllerBase
         {
             return NotFound();
         }
-        catch (Exception ex) when(ex is BusinessException || ex is ValidationException)
+        catch (ForbiddenOperationException ex)
+        {
+            return StatusCode((int)HttpStatusCode.Forbidden, ex.Message);
+        }
+        catch (Exception ex) when (ex is BusinessException || ex is ValidationException)
         {
             return BadRequest(ex.Message);
         }
@@ -204,19 +229,23 @@ public class ProjectController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var command = new CreateTaskCommand(projectId, request.Name, request.Description, request.DueDate);
+        var command = new CreateTaskCommand(_userId, projectId, request.Name, request.Description, request.DueDate);
 
         try
         {
             TaskDto result = await _mediator.Send(command);
 
-            return Ok();
+            return Ok(result);
         }
         catch (ProjectNotFoundException ex)
         {
             return NotFound();
         }
-        catch (Exception ex) when(ex is BusinessException || ex is ValidationException)
+        catch (ForbiddenOperationException ex)
+        {
+            return StatusCode((int)HttpStatusCode.Forbidden, ex.Message);
+        }
+        catch (Exception ex) when (ex is BusinessException || ex is ValidationException)
         {
             return BadRequest(ex.Message);
         }
@@ -229,7 +258,7 @@ public class ProjectController : ControllerBase
     [HttpPut("{projectId}/tasks/{taskId}")]
     public async Task<ActionResult<TaskDto>> UpdateTaskStatus(Guid projectId, Guid taskId, UpdateTaskStatusRequestDto request)
     {
-        var command = new UpdateTaskStatusCommand(projectId, taskId, request.Status);
+        var command = new UpdateTaskStatusCommand(_userId, projectId, taskId, request.Status);
 
         try
         {
@@ -245,6 +274,10 @@ public class ProjectController : ControllerBase
         {
             return NotFound();
         }
+        catch (ForbiddenOperationException ex)
+        {
+            return StatusCode((int)HttpStatusCode.Forbidden, ex.Message);
+        }
         catch (BusinessException ex)
         {
             return BadRequest(ex.Message);
@@ -253,5 +286,20 @@ public class ProjectController : ControllerBase
         {
             return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
         }
+    }
+
+    private Guid GetUserId()
+    {
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (userIdString.IsNullOrEmptyWhiteSpace())
+            throw new ProjectManagementBaseException("Current user's userId not found.");
+
+        if (Guid.TryParse(userIdString, out Guid userId))
+        {
+            return userId;
+        }
+
+        throw new ProjectManagementBaseException("Current user's userId not found.");
     }
 }

@@ -3,6 +3,7 @@
 using OrchidFarmed.ProjectManagement.Application.Contracts;
 using OrchidFarmed.ProjectManagement.Application.Contracts.Queries;
 using OrchidFarmed.ProjectManagement.Domain.Repositories;
+using OrchidFarmed.ProjectManagement.Domain.Shared.Exceptions;
 
 namespace OrchidFarmed.ProjectManagement.Application.Queries;
 
@@ -17,19 +18,24 @@ public class GetProjectQueryHandler : IRequestHandler<GetProjectQuery, ProjectDt
 
     public async Task<ProjectDto> Handle(GetProjectQuery request, CancellationToken cancellationToken)
     {
-        var projectEntity = await _projectRepository.GetAsync(request.ProjectId);
+        var project = await _projectRepository.GetAsync(request.ProjectId);
 
-        if (projectEntity == null)
+        if (project == null)
             return null;
+
+        if (project.UserId != request.UserId)
+            throw new ForbiddenOperationException();
 
         return new ProjectDto()
         {
-            Id = projectEntity.Id,
-            Name = projectEntity.Name,
-            Description = projectEntity.Descroption,
-            Tasks = projectEntity.Tasks.Select(x => new TaskDto
+            UserId = request.UserId,
+            Id = project.Id,
+            Name = project.Name,
+            Description = project.Descroption,
+            Tasks = project.Tasks.Select(x => new TaskDto
             {
-                ProjectId = projectEntity.Id,
+                UserId = request.UserId,
+                ProjectId = project.Id,
                 Id = x.Id,
                 Name = x.Name,
                 Description = x.Description,

@@ -18,18 +18,20 @@ public class GetAllProjectsQueryHandler : IRequestHandler<GetAllProjectsQuery, I
 
     public async Task<IEnumerable<ProjectDto>> Handle(GetAllProjectsQuery request, CancellationToken cancellationToken)
     {
-        IEnumerable<Project> projectEntities = await _projectRepository.GetAllAsync();
+        IEnumerable<Project> projectEntities = await _projectRepository.GetListAsync(p => p.UserId == request.UserId);
 
         if (projectEntities == null)
             return Enumerable.Empty<ProjectDto>();
 
         return projectEntities.Select(p => new ProjectDto
         {
+            UserId = request.UserId,
             Id = p.Id,
             Name = p.Name,
             Description = p.Descroption,
             Tasks = p.Tasks.Select(t => new TaskDto
             {
+                UserId = request.UserId,
                 ProjectId = p.Id,
                 Id = t.Id,
                 Name = t.Name,

@@ -29,7 +29,10 @@ public class CreateTaskCommandHandler : IRequestHandler<CreateTaskCommand, TaskD
         if (project == null)
             throw new ProjectNotFoundException();
 
-        var task = new Domain.Task(project.Id, Guid.NewGuid(), request.Name, request.Description, request.DueDate);
+        if (project.UserId != request.UserId)
+            throw new ForbiddenOperationException();
+
+        var task = new Domain.Task(request.UserId, project.Id, Guid.NewGuid(), request.Name, request.Description, request.DueDate);
 
         project.AddTask(task);
 
@@ -39,6 +42,7 @@ public class CreateTaskCommandHandler : IRequestHandler<CreateTaskCommand, TaskD
 
         return new TaskDto
         {
+            UserId = request.UserId,
             ProjectId = project.Id,
             Id = task.Id,
             Name = request.Name,

@@ -2,6 +2,7 @@
 
 using OrchidFarmed.ProjectManagement.Application.Contracts;
 using OrchidFarmed.ProjectManagement.Application.Contracts.Queries;
+using OrchidFarmed.ProjectManagement.Domain;
 using OrchidFarmed.ProjectManagement.Domain.Repositories;
 using OrchidFarmed.ProjectManagement.Domain.Shared.Exceptions;
 
@@ -18,22 +19,26 @@ public class GetTaskQueryHandler : IRequestHandler<GetTaskQuery, TaskDto>
 
     public async Task<TaskDto> Handle(GetTaskQuery request, CancellationToken cancellationToken)
     {
-        var taskEntity = await _projectRepository.GetTaskAsync(request.TaskId);
+        var task = await _projectRepository.GetTaskAsync(request.TaskId);
 
-        if (taskEntity == null)
+        if (task == null)
             return null;
 
-        if (request.ProjectId != taskEntity.ProjectId)
+        if (request.ProjectId != task.ProjectId)
             throw new BusinessException("The task doesn't belong to the project.");
+
+        if (task.UserId != request.UserId)
+            throw new ForbiddenOperationException();
 
         return new TaskDto()
         {
-            ProjectId = taskEntity.ProjectId,
-            Id = taskEntity.Id,
-            Name = taskEntity.Name,
-            Description = taskEntity.Description,
-            DueDate = taskEntity.DueDate,
-            Status = taskEntity.Status
+            UserId = request.UserId,
+            ProjectId = task.ProjectId,
+            Id = task.Id,
+            Name = task.Name,
+            Description = task.Description,
+            DueDate = task.DueDate,
+            Status = task.Status
         };
     }
 }
