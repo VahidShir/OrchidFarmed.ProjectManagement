@@ -30,7 +30,15 @@ public class AccountController : ControllerBase
         _identitySettings = options.Value;
     }
 
+    /// <summary>
+    /// Create a new user
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPost("SignUp")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> SignUp(SignUpRequestDto request)
     {
         if (!ModelState.IsValid)
@@ -57,8 +65,17 @@ public class AccountController : ControllerBase
         return Created();
     }
 
+    /// <summary>
+    /// Login the user
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPost("SignIn")]
-    public async Task<IActionResult> SignIn(SignInRequestDto request)
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<SignInResponseDto>> SignIn(SignInRequestDto request)
     {
         if (!ModelState.IsValid)
         {
@@ -77,7 +94,7 @@ public class AccountController : ControllerBase
         }
 
         var user = await _userManager.FindByNameAsync(request.UserName);
-        
+
         if (user is null)
         {
             return Unauthorized(new SignInResponseDto
@@ -96,8 +113,9 @@ public class AccountController : ControllerBase
 
         string token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
-        return Ok(new SignInResponseDto { 
-        
+        return Ok(new SignInResponseDto
+        {
+
             IsSuccessful = true,
             Email = user.Email,
             Mobile = user.PhoneNumber,

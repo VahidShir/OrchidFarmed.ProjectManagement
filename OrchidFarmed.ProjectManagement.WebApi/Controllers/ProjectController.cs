@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using OrchidFarmed.ProjectManagement.Application.Contracts;
 using OrchidFarmed.ProjectManagement.Application.Contracts.Commands;
 using OrchidFarmed.ProjectManagement.Application.Contracts.Queries;
+using OrchidFarmed.ProjectManagement.Domain;
 using OrchidFarmed.ProjectManagement.Domain.Shared.Exceptions;
 using OrchidFarmed.ProjectManagement.Domain.Shared.Extensions;
 
@@ -32,7 +33,18 @@ public class ProjectController : ControllerBase
         _mediator = mediator;
     }
 
+    /// <summary>
+    /// Get a project by providing the projectId
+    /// </summary>
+    /// <param name="projectId"></param>
+    /// <returns>The requested project</returns>
     [HttpGet("{projectId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+
     public async Task<ActionResult<ProjectDto>> GetProject(Guid projectId)
     {
         var query = new GetProjectQuery(_userId, projectId);
@@ -60,7 +72,14 @@ public class ProjectController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Get the list of user's projects
+    /// </summary>
+    /// <returns>A collection of projects</returns>
     [HttpGet()]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<IList<ProjectDto>>> GetAllProjects()
     {
         var query = new GetAllProjectsQuery(_userId);
@@ -81,7 +100,18 @@ public class ProjectController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Get the task of a specific project
+    /// </summary>
+    /// <param name="projectId"></param>
+    /// <param name="taskId"></param>
+    /// <returns></returns>
     [HttpGet("{projectId}/tasks/{taskId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<TaskDto>> GetTask(Guid projectId, Guid taskId)
     {
         var query = new GetTaskQuery(_userId, projectId, taskId);
@@ -109,7 +139,17 @@ public class ProjectController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Get the list of the tasks for a specific project
+    /// </summary>
+    /// <param name="projectId"></param>
+    /// <returns></returns>
     [HttpGet("{projectId}/tasks/")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<TaskDto>>> GetTasks(Guid projectId)
     {
         var query = new GetProjectQuery(_userId, projectId);
@@ -137,7 +177,16 @@ public class ProjectController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Create a new project
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<ProjectDto>> CreateProject(CreateProjectRequestDto request)
     {
         if (!ModelState.IsValid)
@@ -161,7 +210,17 @@ public class ProjectController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Delete a project
+    /// </summary>
+    /// <param name="projectId"></param>
+    /// <returns></returns>
     [HttpDelete("{projectId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> DeleteProject(Guid projectId)
     {
         var command = new DeleteProjectCommand(_userId, projectId);
@@ -190,7 +249,18 @@ public class ProjectController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Delete a task from a project
+    /// </summary>
+    /// <param name="projectId"></param>
+    /// <param name="taskId"></param>
+    /// <returns></returns>
     [HttpDelete("{projectId}/tasks/{taskId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> DeleteTask(Guid projectId, Guid taskId)
     {
         var command = new DeleteTaskCommand(_userId, projectId, taskId);
@@ -223,7 +293,18 @@ public class ProjectController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Create a task for a project
+    /// </summary>
+    /// <param name="projectId"></param>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPost("{projectId}/tasks")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<TaskDto>> CreateTask(Guid projectId, CreateTaskRequestDto request)
     {
         if (!ModelState.IsValid)
@@ -233,9 +314,9 @@ public class ProjectController : ControllerBase
 
         try
         {
-            TaskDto result = await _mediator.Send(command);
+            TaskDto task = await _mediator.Send(command);
 
-            return Ok(result);
+            return CreatedAtAction(actionName: nameof(GetTask), routeValues: new { projectId = projectId, taskId = task.Id }, task);
         }
         catch (ProjectNotFoundException ex)
         {
@@ -255,16 +336,28 @@ public class ProjectController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Update the status of a task
+    /// </summary>
+    /// <param name="projectId"></param>
+    /// <param name="taskId"></param>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPut("{projectId}/tasks/{taskId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<TaskDto>> UpdateTaskStatus(Guid projectId, Guid taskId, UpdateTaskStatusRequestDto request)
     {
         var command = new UpdateTaskStatusCommand(_userId, projectId, taskId, request.Status);
 
         try
         {
-            TaskDto result = await _mediator.Send(command);
+            TaskDto task = await _mediator.Send(command);
 
-            return Ok();
+            return Ok(task);
         }
         catch (ProjectNotFoundException ex)
         {

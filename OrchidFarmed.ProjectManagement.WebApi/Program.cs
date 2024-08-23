@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 using OrchidFarmed.ProjectManagement.Application.Contracts.Commands;
 using OrchidFarmed.ProjectManagement.Application.Contracts.Settings;
@@ -52,6 +53,8 @@ public class Program
         {
             // see https://github.com/domaindrivendev/Swashbuckle.AspNetCore/issues/1607
             options.CustomSchemaIds(type => type.ToString());
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "Project Management API Doc", Version = "v1" });
+            options.IncludeXmlComments(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "OrchidFarmed.ProjectManagement.WebApi.xml"));
         });
 
         ConfigMediatR(services);
@@ -63,12 +66,13 @@ public class Program
         //automatic db migrations by running the app
         await MigrateDatabase(app.Services);
 
-        // Configure the HTTP request pipeline.
-        if (app.Environment.IsDevelopment())
+        app.UseSwagger();
+        app.UseSwaggerUI();
+        app.UseReDoc(c =>
         {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
+            c.DocumentTitle = "Project Management API Doc";
+            c.SpecUrl = "/swagger/v1/swagger.json";
+        });
 
         app.UseHttpsRedirection();
 
