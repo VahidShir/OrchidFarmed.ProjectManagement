@@ -1,4 +1,6 @@
-﻿using MediatR;
+﻿using FluentValidation;
+
+using MediatR;
 
 using OrchidFarmed.ProjectManagement.Application.Contracts.Commands;
 using OrchidFarmed.ProjectManagement.Domain.Repositories;
@@ -9,14 +11,18 @@ namespace OrchidFarmed.ProjectManagement.Application.Commands;
 public class DeleteTaskCommandHandler : IRequestHandler<DeleteTaskCommand>
 {
     private readonly IProjectRepository _projectRepository;
+    private readonly IValidator<DeleteTaskCommand> _validator;
 
-    public DeleteTaskCommandHandler(IProjectRepository projectRepository)
+    public DeleteTaskCommandHandler(IProjectRepository projectRepository, IValidator<DeleteTaskCommand> validator)
     {
         _projectRepository = projectRepository;
+        _validator = validator;
     }
 
     public async Task Handle(DeleteTaskCommand request, CancellationToken cancellationToken)
     {
+        _validator.ValidateAndThrow(request);
+
         var project = await _projectRepository.GetAsync(request.ProjectId);
 
         if (project == null)

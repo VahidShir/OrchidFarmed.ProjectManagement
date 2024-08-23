@@ -1,6 +1,8 @@
 
 using Asp.Versioning;
 
+using FluentValidation;
+
 using Microsoft.EntityFrameworkCore;
 
 using OrchidFarmed.ProjectManagement.Application.Contracts.Commands;
@@ -41,6 +43,8 @@ public class Program
 
         ConfigMediatR(services);
 
+        services.AddValidatorsFromAssembly(GetApplicationProjectAssembly());
+
         var app = builder.Build();
 
         //automatic db migrations by running the app
@@ -57,7 +61,6 @@ public class Program
 
         app.UseAuthorization();
 
-
         app.MapControllers();
 
         app.Run();
@@ -65,11 +68,16 @@ public class Program
 
     private static void ConfigMediatR(IServiceCollection services)
     {
+        services.AddMediatR(cf => cf.RegisterServicesFromAssemblies(typeof(CreateProjectCommand).Assembly
+            , GetApplicationProjectAssembly()));
+    }
+
+    private static Assembly GetApplicationProjectAssembly()
+    {
         var applicationProjectAssemblyPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "OrchidFarmed.ProjectManagement.Application.dll");
         var applicationProjectAssembly = Assembly.LoadFile(applicationProjectAssemblyPath);
 
-        services.AddMediatR(cf => cf.RegisterServicesFromAssemblies(typeof(CreateProjectCommand).Assembly
-            , applicationProjectAssembly));
+        return applicationProjectAssembly;
     }
 
     private static async Task MigrateDatabase(IServiceProvider service)

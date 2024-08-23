@@ -1,4 +1,6 @@
-﻿using MediatR;
+﻿using FluentValidation;
+
+using MediatR;
 
 using OrchidFarmed.ProjectManagement.Application.Contracts;
 using OrchidFarmed.ProjectManagement.Application.Contracts.Commands;
@@ -10,14 +12,18 @@ namespace OrchidFarmed.ProjectManagement.Application.Commands;
 public class CreateTaskCommandHandler : IRequestHandler<CreateTaskCommand, TaskDto>
 {
     private readonly IProjectRepository _projectRepository;
+    private readonly IValidator<CreateTaskCommand> _validator;
 
-    public CreateTaskCommandHandler(IProjectRepository projectRepository)
+    public CreateTaskCommandHandler(IProjectRepository projectRepository, IValidator<CreateTaskCommand> validator)
     {
         _projectRepository = projectRepository;
+        _validator = validator;
     }
 
     public async Task<TaskDto> Handle(CreateTaskCommand request, CancellationToken cancellationToken)
     {
+        _validator.ValidateAndThrow(request);
+
         var project = await _projectRepository.GetAsync(request.ProjectId);
 
         if (project == null)

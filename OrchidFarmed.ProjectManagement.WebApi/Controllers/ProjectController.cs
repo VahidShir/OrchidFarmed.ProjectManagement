@@ -1,5 +1,7 @@
 ﻿using Asp.Versioning;
 
+using FluentValidation;
+
 using MediatR;
 
 using Microsoft.AspNetCore.Mvc;
@@ -132,7 +134,7 @@ public class ProjectController : ControllerBase
 
             return CreatedAtAction(actionName: nameof(GetProject), routeValues: new { projectId = project.Id }, project);
         }
-        catch (BusinessException ex)
+        catch (Exception ex) when(ex is BusinessException || ex is ValidationException)
         {
             return BadRequest(ex.Message);
         }
@@ -157,7 +159,7 @@ public class ProjectController : ControllerBase
         {
             return NotFound();
         }
-        catch (BusinessException ex)
+        catch (Exception ex) when(ex is BusinessException || ex is ValidationException)
         {
             return BadRequest(ex.Message);
         }
@@ -186,7 +188,7 @@ public class ProjectController : ControllerBase
         {
             return NotFound();
         }
-        catch (BusinessException ex)
+        catch (Exception ex) when(ex is BusinessException || ex is ValidationException)
         {
             return BadRequest(ex.Message);
         }
@@ -214,7 +216,7 @@ public class ProjectController : ControllerBase
         {
             return NotFound();
         }
-        catch (BusinessException ex)
+        catch (Exception ex) when(ex is BusinessException || ex is ValidationException)
         {
             return BadRequest(ex.Message);
         }
