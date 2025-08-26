@@ -1,0 +1,22 @@
+﻿using FluentValidation;
+
+using ProjectManagement.Application.Contracts.Commands;
+
+namespace ProjectManagement.Application.Validations;
+
+public class CreateProjectCommandValidator : AbstractValidator<CreateProjectCommand>
+{
+    public CreateProjectCommandValidator()
+    {
+        RuleFor(x => x.Name)
+            .NotEmpty().WithMessage("The parameter Name must be NOT null or empty.")
+            .MaximumLength(200).WithMessage($"The length of the parameter Name must be maximum 200.");
+
+        RuleFor(x => x.Description)
+            .NotEmpty().WithMessage("The parameter Description must be NOT null or empty.")
+            .MaximumLength(200).WithMessage($"The length of the parameter Description must be maximum 500.");
+
+        RuleFor(x => x.UserId)
+            .Must(x => x.ToString().ToLower() != Guid.Empty.ToString()).WithMessage("The parameter UserId must NOT be null or empty or default.");
+    }
+}

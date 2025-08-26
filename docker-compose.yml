@@ -23,6 +23,6 @@ services:
             - 8080:8080
         build:
           context: .
-          dockerfile: OrchidFarmed.ProjectManagement.WebApi/Dockerfile
+          dockerfile: ProjectManagement.WebApi/Dockerfile
         depends_on:
             - SqlServerDb
